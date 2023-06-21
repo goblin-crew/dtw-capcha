@@ -1,12 +1,11 @@
 import stow
 import tensorflow
-from keras import layers
-from keras.models import Model
+from tensorflow.python.keras import layers, Model
 from mltu.callbacks import TrainLogger, Model2onnx
 from mltu.losses import CTCloss
 from mltu.metrics import CWERMetric
 from mltu.model_utils import residual_block
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
+from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
 
 from configs import ModelConfigs
 from mltu.dataProvider import DataProvider
