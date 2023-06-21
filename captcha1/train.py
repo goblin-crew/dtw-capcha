@@ -1,6 +1,7 @@
 import stow
 import tensorflow
-from tensorflow.python.keras import layers, Model
+from tensorflow.python.keras import Model
+from keras import layers
 from mltu.callbacks import TrainLogger, Model2onnx
 from mltu.losses import CTCloss
 from mltu.metrics import CWERMetric
