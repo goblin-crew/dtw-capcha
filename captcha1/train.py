@@ -82,7 +82,7 @@ data_provider = DataProvider(
     dataset=dataset,
     skip_validation=True,
     batch_size=configs.batch_size,
-    data_preprocessors=[ImageReader()],
+    data_preprocessors=[DataPreprocessor()],
     transformers=[
         ImageResizer(configs.width, configs.height),
         LabelIndexer(configs.vocab),
