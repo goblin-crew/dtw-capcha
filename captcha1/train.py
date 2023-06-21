@@ -47,12 +47,13 @@ def train_model(input_dim, output_dim, activation='leaky_relu', dropout=0.2):
     return model
 
 
+optional_base_path = stow.dirname(__file__)
 # Load dataset
 print("loading dataset")
 dataset, vocab, max_len = [], set(), 0
 for line in open("samples/index.txt"):
     parts = line.split(" ")
-    dataset.append([stow.relpath(parts[1]), parts[0]])
+    dataset.append([stow.relpath(optional_base_path+parts[1]), parts[0]])
     vocab.update(list(parts[0]))
     max_len = max(max_len, len(parts[0]))
 
