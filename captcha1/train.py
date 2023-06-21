@@ -55,7 +55,6 @@ for line in open("samples/index.txt"):
     dataset.append([stow.relpath(parts[1]), parts[0]])
     vocab.update(list(parts[0]))
     max_len = max(max_len, len(parts[0]))
-    print(f"loading {parts[1]}", end="\r")
 
 print("dataset loaded")
 print("Generating configs")
