@@ -20,6 +20,7 @@ class DataPreprocessor:
         self._method = method
 
     def __call__(self, image_path: str, label: str):
+        print("Reading: " + image_path + "from directory" + stow.abspath(__file__))
         return cv2.imread(image_path, self._method), label
 
 
