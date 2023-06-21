@@ -1,2 +1,4 @@
 mltu==0.1.4
 tensorflow<=2.10
+opencv-python
+

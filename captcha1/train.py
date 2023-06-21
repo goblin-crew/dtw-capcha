@@ -1,6 +1,7 @@
 import stow
 import tensorflow
 from mltu.callbacks import TrainLogger, Model2onnx
+import cv2
 import tensorflow as tf
 from mltu.losses import CTCloss
 from mltu.metrics import CWERMetric
@@ -9,9 +10,17 @@ from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, Te
 
 from configs import ModelConfigs
 from mltu.dataProvider import DataProvider
-from mltu.preprocessors import ImageReader
 from mltu.transformers import ImageResizer, LabelIndexer, LabelPadding
 from mltu.augmentors import RandomBrightness, RandomRotate, RandomErodeDilate
+from mltu.preprocessors import ImageReader
+
+
+class DataPreprocessor:
+    def __init__(self, method: int = cv2.IMREAD_COLOR, *args, **kwargs):
+        self._method = method
+
+    def __call__(self, image_path: str, label: str):
+        return cv2.imread(image_path, self._method), label
 
 
 def train_model(input_dim, output_dim, activation='leaky_relu', dropout=0.2):
