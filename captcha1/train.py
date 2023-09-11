@@ -1,18 +1,18 @@
+import os
+
 import stow
-import tensorflow
 from mltu.callbacks import TrainLogger, Model2onnx
-import cv2
 import tensorflow as tf
 from mltu.losses import CTCloss
 from mltu.metrics import CWERMetric
 from mltu.model_utils import residual_block
 from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
+import cv2
 
 from configs import ModelConfigs
 from mltu.dataProvider import DataProvider
 from mltu.transformers import ImageResizer, LabelIndexer, LabelPadding
 from mltu.augmentors import RandomBrightness, RandomRotate, RandomErodeDilate
-from mltu.preprocessors import ImageReader
 
 
 class DataPreprocessor:
@@ -20,7 +20,6 @@ class DataPreprocessor:
         self._method = method
 
     def __call__(self, image_path: str, label: str):
-        print("Reading: " + image_path + "from directory: " + stow.abspath(__file__) + "File exists: " + str(stow.exists(image_path)))
         return cv2.imread(image_path, self._method), label
 
 
@@ -52,8 +51,8 @@ def train_model(input_dim, output_dim, activation='leaky_relu', dropout=0.2):
 
     output = tf.keras.layers.Dense(output_dim + 1, activation='softmax', name="output")(blstm)
 
-    model = tf.keras.Model(inputs=inputs, outputs=output)
-    return model
+    new_model = tf.keras.Model(inputs=inputs, outputs=output)
+    return new_model
 
 
 # Take input parameters from launch if exists
@@ -63,13 +62,14 @@ print("loading dataset")
 dataset, vocab, max_len = [], set(), 0
 for line in open("samples/index.txt"):
     parts = line.split(" ")
-    dataset.append([stow.relpath(optional_base_path + parts[1]), parts[0]])
+    dataset.append([stow.relpath(optional_base_path + parts[1].strip()), parts[0].strip()])
     vocab.update(list(parts[0]))
     max_len = max(max_len, len(parts[0]))
 
-print("dataset loaded")
 print("Generating configs")
 configs = ModelConfigs()
+print("Sample image path: ", dataset[0][0] + " This should be on the same line 01")
+print("Sample label: ", dataset[0][1] + " This should be on the same line 02")
 
 # Save vocab and maximum text length to configs
 configs.vocab = sorted(list(vocab))
@@ -105,7 +105,7 @@ model = train_model(
 # Compile model
 print("compiling model")
 model.compile(
-    optimizer=tensorflow.keras.optimizers.Adam(learning_rate=configs.learning_rate),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=configs.learning_rate),
     loss=CTCloss(),
     metrics=[CWERMetric()],
 )

@@ -1,6 +1,5 @@
 import random
 import re
-import time
 
 from PIL import Image, ImageDraw, ImageFont
 import os
@@ -12,7 +11,7 @@ def sanitize_filename(filename):
 
 
 # Function to generate images of text
-def generate_text_images(sequence, font_path, output_folder):
+def generate_text_images(sequence, font_path, output_folder, file_nr):
     # Create the output folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
 
@@ -41,7 +40,7 @@ def generate_text_images(sequence, font_path, output_folder):
     sanitized_sequence = sanitize_filename(sequence)
 
     # Save the image as a PNG file
-    output_path = os.path.join(output_folder, f"{sanitized_sequence}.png")
+    output_path = os.path.join(output_folder, f"{str(file_nr)}.png")
     image.save(output_path)
     # Write to file sequence and filename
     with open("samples/index.txt", "a") as f:
@@ -65,7 +64,7 @@ def generateSequence(charset, length):
 
 sample_count = 1000
 offset = 0
-sample_output = "./samples"
+sample_output = "samples"
 font_path = "./unispace.ttf"
 remaining_samples = sample_count
 estimated_time = remaining_samples * 0.5
@@ -76,5 +75,5 @@ sequence_length = 40
 # Download samples
 for i in range(offset, sample_count):
     recalculate_estimated_time(remaining_samples)
-    generate_text_images(generateSequence(charset, sequence_length), font_path, sample_output)
+    generate_text_images(generateSequence(charset, sequence_length), font_path, sample_output, file_nr=i)
     remaining_samples -= 1
