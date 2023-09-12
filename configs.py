@@ -7,9 +7,9 @@ from mltu.configs import BaseModelConfigs
 class ModelConfigs(BaseModelConfigs):
     def __init__(self):
         super().__init__()
-        self.model_name = 'captcha-3'
-        self.model_path = 'models/captcha-3.keras'
-        self.data_dir = 'samples/captcha-3'
+        self.model_name = 'captcha-4'
+        self.model_path = 'models/captcha-4.keras'
+        self.data_dir = 'samples/captcha-4'
         self.vocab = []
         self.height = 40
         self.width = 400
@@ -18,7 +18,7 @@ class ModelConfigs(BaseModelConfigs):
         self.max_text_length = 15
         self.batch_size = 16
         self.learning_rate = 1e-3
-        self.train_epochs = 50
+        self.train_epochs = 40
         self.train_workers = 20
         self.downsample_factor = 4
         self.shuffle = True

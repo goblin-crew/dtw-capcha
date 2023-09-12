@@ -59,21 +59,19 @@ def generate_image_sequence(output_folder, file_nr):
     os.makedirs(output_folder, exist_ok=True)
     sequence = generateSequence(charMap, sequence_length)
 
-    char_spacing = 18
+    char_spacing = 5
 
-    char_width = 26
+    char_width = configs.width / sequence_length - char_spacing
     char_height = char_width
 
-    img = Image.new('RGB', (450, 60), color=(255, 255, 255))
+    img = Image.new('RGB', (configs.width, configs.height), color=(255, 255, 255))
     for i, char in enumerate(sequence):
-        char_img = generate_image(char, image_size=(int(char_width), int(char_height)), rotate=True)
-        vertival_offset = random.randint(-12, 12)
-        horizontal_offset = random.randint(-10, 10)
+        char_img = generate_image(char, image_size=(int(char_width), int(char_height)), rotate=False)
+        vertival_offset = random.randint(-8, 8)
+        horizontal_offset = random.randint(-4, 4)
         # img.paste(char_img, (int(i * char_width + (i + 1) * char_spacing), int(char_height / 2)))
-        img.paste(char_img, (int(i * char_width + i * char_spacing + horizontal_offset + (char_width / 2)),
+        img.paste(char_img, (int(i * char_width + (i + 1) * char_spacing + horizontal_offset),
                              int(char_height / 2 + vertival_offset)), char_img)
-
-    img = img.resize((configs.width, configs.height), Image.LANCZOS)
     img.save(os.path.join(output_folder, f"{str(file_nr)}.png"))
 
     # Save the image as a PNG file
