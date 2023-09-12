@@ -5,6 +5,26 @@ import keras
 import numpy as np
 from keras import layers
 
+from configs import ModelConfigs
+from objectDetection import getContours
+
+configs = ModelConfigs()
+
+charMap = [
+    {'symbol': ':D', 'char': 'A', 'file': 'emojis/0.png'},
+    {'symbol': ':)', 'char': 'B', 'file': 'emojis/1.png'},
+    {'symbol': ':P', 'char': 'C', 'file': 'emojis/2.png'},
+    {'symbol': ':(', 'char': 'D', 'file': 'emojis/3.png'},
+    {'symbol': ';)', 'char': 'E', 'file': 'emojis/4.png'},
+    {'symbol': 'B)', 'char': 'F', 'file': 'emojis/5.png'},
+    {'symbol': ':@', 'char': 'G', 'file': 'emojis/6.png'},
+    {'symbol': ':o', 'char': 'H', 'file': 'emojis/7.png'},
+    {'symbol': ':s', 'char': 'I', 'file': 'emojis/8.png'},
+    {'symbol': ':|', 'char': 'J', 'file': 'emojis/9.png'},
+    {'symbol': ':/', 'char': 'K', 'file': 'emojis/10.png'},
+    {'symbol': '<3', 'char': 'L', 'file': 'emojis/11.png'}
+]
+
 
 class CTCLayer(layers.Layer):
     def __init__(self, trainable, dtype, name=None):
@@ -39,14 +59,20 @@ def decode_batch_predictions(pred, characters, labels_to_char):
                 outstr += labels_to_char[c]
         output_text.append(outstr)
 
+    if configs.custom_char_map:
+        for i, text in enumerate(output_text):
+            for char in text:
+                for charMapItem in charMap:
+                    if char == charMapItem['char']:
+                        output_text[i] = output_text[i].replace(char, str(charMapItem['symbol']))
     # return final text results
     return output_text
 
 
 class UseModel:
     # Define image dimensions
-    img_width = 450
-    img_height = 40
+    img_width = configs.width
+    img_height = configs.height
 
     # Store all the characters in a set
     characters = set()
@@ -58,7 +84,7 @@ class UseModel:
     labels_to_char = {}
 
     def __init__(self):
-        model = keras.models.load_model('capcha-1.keras', custom_objects={"CTCLayer": CTCLayer})
+        model = keras.models.load_model(configs.model_path, custom_objects={"CTCLayer": CTCLayer})
 
         self.prediction_model = keras.models.Model(model.get_layer(name='input_data').input,
                                                    model.get_layer(name='dense2').output)
@@ -67,10 +93,9 @@ class UseModel:
     def load_data(self):
         # Iterate over the dataset and store the
         # information needed
-        for line in open("samples/index.txt"):
+        for line in open(os.path.join(configs.data_dir, "index.txt")):
             parts = line.split(" ")
             # 1. Get the label associated with each image
-            img_path = str.strip(parts[1]).replace('\\', '/')
             label = str.strip(parts[0])
             # 2. Store the length of this cpatcha
             self.captcha_length.append(len(label))
@@ -88,13 +113,7 @@ class UseModel:
         # Map numeric labels to text
         self.labels_to_char = {val: key for key, val in self.char_to_labels.items()}
 
-    def predict(self, img_path):
-        img_path = str.strip(img_path).replace('\\', '/')
-        img_path = img_path.replace('input/', '')
-        img_path = os.path.join("input/", img_path)
-
-        # Load and preprocess a single image
-        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Load as grayscale
+    def prepare_image(self, img):
 
         # Apply thresholding to create a binary image
         _, img = cv2.threshold(img, 200, 255, cv2.THRESH_BINARY)
@@ -106,8 +125,29 @@ class UseModel:
         # Reshape the image to match the model's input shape
         img = img.reshape((1, self.img_height, self.img_width, 1)).T
 
-        # Make predictions using the model
-        prediction_text = self.prediction_model.predict(img)
-        prediction_text = decode_batch_predictions(prediction_text, self.characters, self.labels_to_char)[0]
-        print(prediction_text)
-        return str(prediction_text)
+        return img
+
+    def predict(self, img_path, needs_object_detection=configs.needs_object_detection):
+        img_path = str.strip(img_path).replace('\\', '/')
+        img_path = img_path.replace('input/', '')
+        img_path = os.path.join("input/", img_path)
+        final_text = ""
+
+        if needs_object_detection:
+            (detected_emojis, _) = getContours(img_path)
+            for i, emoji in enumerate(detected_emojis):
+                emoji = self.prepare_image(emoji)
+                prediction_text = self.prediction_model.predict(emoji)
+                final_text += decode_batch_predictions(prediction_text, self.characters, self.labels_to_char)[0]
+        else:
+            # Load and preprocess a single image
+            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Load as grayscale
+
+            img = self.prepare_image(img)
+
+            # Make predictions using the model
+            prediction_text = self.prediction_model.predict(img)
+
+            final_text = decode_batch_predictions(prediction_text, self.characters, self.labels_to_char)[0]
+        print(final_text)
+        return str(final_text)

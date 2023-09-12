@@ -1,12 +1,15 @@
 from flask import Flask, request
 from flask_cors import CORS
 
-from captcha1.useModel import UseModel
+from configs import ModelConfigs
+from useModel import UseModel
 
 app = Flask(__name__)
 CORS(app)
 
 ocr = UseModel()
+
+configs = ModelConfigs()
 
 
 @app.route("/", methods=['POST'])

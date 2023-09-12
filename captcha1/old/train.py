@@ -60,7 +60,7 @@ optional_base_path = ''
 # Load dataset
 print("loading dataset")
 dataset, vocab, max_len = [], set(), 0
-for line in open("samples/index.txt"):
+for line in open("../../samples/captcha-1/index.txt"):
     parts = line.split(" ")
     dataset.append([stow.relpath(optional_base_path + parts[1].strip()), parts[0].strip()])
     vocab.update(list(parts[0]))

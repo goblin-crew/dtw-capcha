@@ -43,7 +43,7 @@ def generate_text_images(sequence, font_path, output_folder, file_nr):
     output_path = os.path.join(output_folder, f"{str(file_nr)}.png")
     image.save(output_path)
     # Write to file sequence and filename
-    with open("samples/index.txt", "a") as f:
+    with open("samples/capcha-1/index.txt", "a") as f:
         f.write(f"{sequence} {output_path}\n")
     print(f"Saved image: {output_path}"
           f" ({remaining_samples}/{sample_count}) - {estimated_time:.2f}s left", end="\r")
@@ -65,7 +65,7 @@ def generateSequence(charset, length):
 sample_count = 1000
 offset = 0
 sample_output = "samples"
-font_path = "./unispace.ttf"
+font_path = "unispace.ttf"
 remaining_samples = sample_count
 estimated_time = remaining_samples * 0.5
 original_estimated_time = estimated_time
