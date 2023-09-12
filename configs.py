@@ -26,4 +26,4 @@ class ModelConfigs(BaseModelConfigs):
         self.needs_object_detection = False
         self.custom_char_map = True
         self.continue_training = True
-        self.base_model = 'models/captcha-2.keras'
+        self.base_model = 'models/captcha-3.keras'

@@ -13,7 +13,7 @@ configs = ModelConfigs()
 charMap = [
     {'symbol': ':D', 'char': 'A', 'file': 'emojis/0.png'},
     {'symbol': ':)', 'char': 'B', 'file': 'emojis/1.png'},
-    {'symbol': ':P', 'char': 'C', 'file': 'emojis/2.png'},
+    {'symbol': ':p', 'char': 'C', 'file': 'emojis/2.png'},
     {'symbol': ':(', 'char': 'D', 'file': 'emojis/3.png'},
     {'symbol': ';)', 'char': 'E', 'file': 'emojis/4.png'},
     {'symbol': 'B)', 'char': 'F', 'file': 'emojis/5.png'},
@@ -24,6 +24,8 @@ charMap = [
     {'symbol': ':/', 'char': 'K', 'file': 'emojis/10.png'},
     {'symbol': '<3', 'char': 'L', 'file': 'emojis/11.png'}
 ]
+
+charSymbolMap = {item['char']: item['symbol'] for item in charMap}
 
 
 class CTCLayer(layers.Layer):
@@ -56,15 +58,12 @@ def decode_batch_predictions(pred, characters, labels_to_char):
         outstr = ''
         for c in res:
             if c < len(characters) and c >= 0:
-                outstr += labels_to_char[c]
+                if configs.custom_char_map:
+                    outstr += charSymbolMap[labels_to_char[c]]
+                else:
+                    outstr += labels_to_char[c]
         output_text.append(outstr)
 
-    if configs.custom_char_map:
-        for i, text in enumerate(output_text):
-            for char in text:
-                for charMapItem in charMap:
-                    if char == charMapItem['char']:
-                        output_text[i] = output_text[i].replace(char, str(charMapItem['symbol']))
     # return final text results
     return output_text
 
@@ -148,6 +147,6 @@ class UseModel:
             # Make predictions using the model
             prediction_text = self.prediction_model.predict(img)
 
-            final_text = decode_batch_predictions(prediction_text, self.characters, self.labels_to_char)[0]
-        print(final_text)
+            final_text = ''.join(decode_batch_predictions(prediction_text, self.characters, self.labels_to_char))
+        print(str(final_text))
         return str(final_text)

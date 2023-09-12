@@ -67,7 +67,11 @@ def generate_image_sequence(output_folder, file_nr):
     img = Image.new('RGB', (configs.width, configs.height), color=(255, 255, 255))
     for i, char in enumerate(sequence):
         char_img = generate_image(char, image_size=(int(char_width), int(char_height)), rotate=False)
-        img.paste(char_img, (int(i * char_width + (i + 1) * char_spacing), int(char_height / 2)))
+        vertival_offset = random.randint(-8, 8)
+        horizontal_offset = random.randint(-4, 4)
+        # img.paste(char_img, (int(i * char_width + (i + 1) * char_spacing), int(char_height / 2)))
+        img.paste(char_img, (int(i * char_width + (i + 1) * char_spacing + horizontal_offset),
+                             int(char_height / 2 + vertival_offset)), char_img)
     img.save(os.path.join(output_folder, f"{str(file_nr)}.png"))
 
     # Save the image as a PNG file
@@ -96,7 +100,7 @@ def generateSequence(charset, length):
     return sequence
 
 
-sample_count = 1000
+sample_count = 5000
 offset = 0
 sample_output = configs.data_dir
 
@@ -120,7 +124,7 @@ charMap = [
 ]
 # I only want the char
 charset = [char['char'] for char in charMap]
-sequence_length = configs.sequence_length
+sequence_length = configs.max_text_length
 
 generate_image_sequence(sample_output, 0)
 

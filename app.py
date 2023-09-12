@@ -17,6 +17,6 @@ def get_captcha():
     f = request.files['image']
     f.save('input/captcha.png')
     result = ocr.predict('captcha.png')
-    return {"result": result}
+    return {"result": str(result)}
 
 
