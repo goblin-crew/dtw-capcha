@@ -22,17 +22,21 @@ def generate_image(char, rotate=True, **kwargs):
     # os.makedirs(output_folder, exist_ok=True)
 
     # Set the desired image size and font size
-    if 'image_size' in kwargs:
-        image_size = kwargs['image_size']
+    if "image_size" in kwargs:
+        image_size = kwargs["image_size"]
     else:
         image_size = (configs.char_width, configs.char_height)
 
-    char_img = Image.open(char['file'])
+    char_img = Image.open(char["file"])
     new_img = char_img.resize(image_size)
 
     if rotate:
         rotation_fraction = (360 / 8) + random.randint(-5, 5)
-        new_img = new_img.rotate(rotation_fraction * random.randint(0, 8), fillcolor=255, resample=Image.BILINEAR)
+        new_img = new_img.rotate(
+            rotation_fraction * random.randint(0, 8),
+            fillcolor=255,
+            resample=Image.BILINEAR,
+        )
 
     new_img = new_img.convert("RGBA")
     # Blur the image
@@ -64,14 +68,27 @@ def generate_image_sequence(output_folder, file_nr):
     char_width = 26
     char_height = char_width
 
-    img = Image.new('RGB', (450, 60), color=(255, 255, 255))
+    img = Image.new("RGB", (450, 60), color=(255, 255, 255))
     for i, char in enumerate(sequence):
-        char_img = generate_image(char, image_size=(int(char_width), int(char_height)), rotate=True)
+        char_img = generate_image(
+            char, image_size=(int(char_width), int(char_height)), rotate=True
+        )
         vertival_offset = random.randint(-12, 12)
         horizontal_offset = random.randint(-10, 10)
         # img.paste(char_img, (int(i * char_width + (i + 1) * char_spacing), int(char_height / 2)))
-        img.paste(char_img, (int(i * char_width + i * char_spacing + horizontal_offset + (char_width / 2)),
-                             int(char_height / 2 + vertival_offset)), char_img)
+        img.paste(
+            char_img,
+            (
+                int(
+                    i * char_width
+                    + i * char_spacing
+                    + horizontal_offset
+                    + (char_width / 2)
+                ),
+                int(char_height / 2 + vertival_offset),
+            ),
+            char_img,
+        )
 
     img = img.resize((configs.width, configs.height), Image.LANCZOS)
     img.save(os.path.join(output_folder, f"{str(file_nr)}.png"))
@@ -79,14 +96,17 @@ def generate_image_sequence(output_folder, file_nr):
     # Save the image as a PNG file
     output_path = f"{str(file_nr)}.png"
 
-    char_sequence = "".join([char['char'] for char in sequence])
+    char_sequence = "".join([char["char"] for char in sequence])
 
     # Write to file sequence and filename
     with open(os.path.join(output_folder, "index.txt"), "a") as f:
         f.write(f"{char_sequence} {output_path}\n")
 
-    print(f"Saved image: {output_path}"
-          f" ({remaining_samples}/{sample_count}) - {estimated_time:.2f}s left", end="\r")
+    print(
+        f"Saved image: {output_path}"
+        f" ({sample_count - remaining_samples}/{sample_count}) - {estimated_time:.2f}s left",
+        end="\r",
+    )
 
 
 # Recalculate estimated time, based on remaining samples and average download time
@@ -111,21 +131,21 @@ estimated_time = remaining_samples * 0.5
 original_estimated_time = estimated_time
 
 charMap = [
-    {'symbol': ':D', 'char': 'A', 'file': 'emojis/0.png'},
-    {'symbol': ':)', 'char': 'B', 'file': 'emojis/1.png'},
-    {'symbol': ':P', 'char': 'C', 'file': 'emojis/2.png'},
-    {'symbol': ':(', 'char': 'D', 'file': 'emojis/3.png'},
-    {'symbol': ';)', 'char': 'E', 'file': 'emojis/4.png'},
-    {'symbol': 'B)', 'char': 'F', 'file': 'emojis/5.png'},
-    {'symbol': ':@', 'char': 'G', 'file': 'emojis/6.png'},
-    {'symbol': ':o', 'char': 'H', 'file': 'emojis/7.png'},
-    {'symbol': ':S', 'char': 'I', 'file': 'emojis/8.png'},
-    {'symbol': ':|', 'char': 'J', 'file': 'emojis/9.png'},
-    {'symbol': ':/', 'char': 'K', 'file': 'emojis/10.png'},
-    {'symbol': '<3', 'char': 'L', 'file': 'emojis/11.png'}
+    {"symbol": ":D", "char": "A", "file": "emojis/0.png"},
+    {"symbol": ":)", "char": "B", "file": "emojis/1.png"},
+    {"symbol": ":P", "char": "C", "file": "emojis/2.png"},
+    {"symbol": ":(", "char": "D", "file": "emojis/3.png"},
+    {"symbol": ";)", "char": "E", "file": "emojis/4.png"},
+    {"symbol": "B)", "char": "F", "file": "emojis/5.png"},
+    {"symbol": ":@", "char": "G", "file": "emojis/6.png"},
+    {"symbol": ":o", "char": "H", "file": "emojis/7.png"},
+    {"symbol": ":S", "char": "I", "file": "emojis/8.png"},
+    {"symbol": ":|", "char": "J", "file": "emojis/9.png"},
+    {"symbol": ":/", "char": "K", "file": "emojis/10.png"},
+    {"symbol": "<3", "char": "L", "file": "emojis/11.png"},
 ]
 # I only want the char
-charset = [char['char'] for char in charMap]
+charset = [char["char"] for char in charMap]
 sequence_length = configs.max_text_length
 
 generate_image_sequence(sample_output, 0)

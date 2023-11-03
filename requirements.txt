@@ -6,4 +6,5 @@ numpy~=1.25.0
 flask~=2.3.3
 keras~=2.10.0
 opencv-python~=4.8.0.76
-pytesseract~=0.3.10
+scikit-learn
+pandas
